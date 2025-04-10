@@ -1,6 +1,6 @@
 keras==3.9.1
 numpy==2.1.3
-opencv-python==4.11.0.86
+opencv-python
 pandas==2.2.3
 pillow==11.1.0
 scikit-learn==1.6.1
