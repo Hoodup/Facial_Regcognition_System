@@ -101,7 +101,7 @@ if st.button('Take a Picture'):
             break
 
     cap.release()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
 
     # Process the captured image
     faces = detect_faces("captured_image.jpg")
