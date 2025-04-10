@@ -9,7 +9,7 @@ from PIL import Image
 
 # Load your pre-trained SVM model
 def load_svm_model():
-    with open('svm_model_100.pkl', 'rb') as f:
+    with open('svm_model.pkl', 'rb') as f:
         clf = pickle.load(f)
     return clf
 
@@ -43,12 +43,30 @@ def get_embeddings(face_images, model):
     return embeddings
 
 # Classify the faces with the trained SVM model
-def classify_faces(embeddings, clf):
+# def classify_faces(embeddings, clf, threshold=0.7):
+#     predictions = []
+#     for embedding in embeddings:
+#         prediction = clf.predict([embedding])
+#         predictions.append(prediction[0])
+#     return predictions
+
+def classify_faces(embeddings, clf, threshold=0.7):
     predictions = []
+    confidences = []
     for embedding in embeddings:
-        prediction = clf.predict([embedding])
-        predictions.append(prediction[0])
-    return predictions
+        probabilities = clf.predict_proba([embedding])[0]
+        max_prob = max(probabilities)
+        predicted_label = clf.classes_[np.argmax(probabilities)]
+        
+        if max_prob < threshold:
+            predictions.append("Unauthorized Identity. If you believe otherwise, upload a clearer image with single face")
+            confidences.append(f"Confidence: {max_prob:.2f}")
+        else:
+            predictions.append(f"{predicted_label} (Confidence: {max_prob:.2f})")
+            confidences.append(f"Confidence: {max_prob:.2f}")
+    
+    return predictions, confidences
+
 
 # Streamlit app interface
 st.title('Face Recognition App')
@@ -73,43 +91,54 @@ if uploaded_file is not None:
     embeddings = get_embeddings(faces, vgg16_model)
     
     # Classify faces
-    predictions = classify_faces(embeddings, clf)
+    # predictions = classify_faces(embeddings, clf)
+
+    # # Display results
+    # for idx, prediction in enumerate(predictions):
+    #     st.write(f"Face {idx+1} is predicted as: {prediction}")
+
+   # Classify faces with probabilities
+    predictions, confidences = classify_faces(embeddings, clf)
 
     # Display results
-    for idx, prediction in enumerate(predictions):
-        st.write(f"Face {idx+1} is predicted as: {prediction}")
+    actual_names =['Tomiwa', 'Samuel', 'Ransome', 'Calistus', 'Seun', 'Ms. Christabel']
+    for idx, (prediction, confidence) in enumerate(zip(predictions, confidences)):
+        st.write(f"Face {idx+1}: {actual_names[idx]} {prediction}")
+        st.write(f"Confidence: {confidence}")
 
 # Take picture using webcam
-if st.button('Take a Picture'):
-    run = st.empty()
-    cap = cv2.VideoCapture(0)  # 0 is the default camera
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+# if st.button('Take a Picture'):
+#     pass
+#     run = st.empty()
+#     cap = cv2.VideoCapture(0)  # 0 is the default camera
+#     while True:
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
 
-        # Display the video feed
-        cv2.imshow('Webcam', frame)
+#         # Display the video feed
+#         cv2.imshow('Webcam', frame)
 
-        # Break the loop when user presses 'q'
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+#         # Break the loop when user presses 'q'
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
 
-        # Capture and save the image when 's' is pressed
-        if cv2.waitKey(1) & 0xFF == ord('s'):
-            cv2.imwrite("captured_image.jpg", frame)
-            break
+#         # Capture and save the image when 's' is pressed
+#         if cv2.waitKey(1) & 0xFF == ord('s'):
+#             cv2.imwrite("captured_image.jpg", frame)
+#             break
 
-    cap.release()
-    #cv2.destroyAllWindows()
+#     cap.release()
+#     cv2.destroyAllWindows()
 
     # Process the captured image
-    faces = detect_faces("captured_image.jpg")
-    embeddings = get_embeddings(faces, vgg16_model)
+   #  faces = detect_faces("captured_image.jpg")
+   #  embeddings = get_embeddings(faces, vgg16_model)
 
-    # Classify faces
-    predictions = classify_faces(embeddings, clf)
+   # # Classify faces with probabilities
+   #  predictions, confidences = classify_faces(embeddings, clf)
 
-    # Display results
-    for idx, prediction in enumerate(predictions):
-        st.write(f"Face {idx+1} is predicted as: {prediction}")
+   #  # Display results
+   #  for idx, (prediction, confidence) in enumerate(zip(predictions, confidences)):
+   #      st.write(f"Face {idx+1}: {prediction}")
+   #      st.write(f"Confidence: {confidence}")
