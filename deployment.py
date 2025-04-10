@@ -9,7 +9,7 @@ from PIL import Image
 
 # Load your pre-trained SVM model
 def load_svm_model():
-    with open('svm_model.pkl', 'rb') as f:
+    with open('svm_model_100.pkl', 'rb') as f:
         clf = pickle.load(f)
     return clf
 
