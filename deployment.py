@@ -103,7 +103,7 @@ if uploaded_file is not None:
     # Display results
     actual_names =['Tomiwa', 'Samuel', 'Ransome', 'Calistus', 'Seun', 'Ms. Christabel']
     for idx, (prediction, confidence) in enumerate(zip(predictions, confidences)):
-        st.write(f"Face {idx+1}: {actual_names[idx]} {prediction}")
+        st.write(f"Face {idx+1}: {prediction}")
         st.write(f"Confidence: {confidence}")
 
 # Take picture using webcam
