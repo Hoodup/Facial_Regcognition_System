@@ -50,7 +50,7 @@ def get_embeddings(face_images, model):
 #         predictions.append(prediction[0])
 #     return predictions
 
-def classify_faces(embeddings, clf, threshold=0.7):
+def classify_faces(embeddings, clf, threshold=0.58):
     predictions = []
     confidences = []
     for embedding in embeddings:
